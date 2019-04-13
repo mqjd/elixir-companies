@@ -1,6 +1,6 @@
 defmodule Notify do
   @moduledoc """
-  Context module that handles the sending of actual notifications 
+  Context module that handles the sending of actual notifications
   """
   alias Notify.{Email, Mailer}
 
@@ -18,7 +18,9 @@ defmodule Notify do
     |> Mailer.deliver_now()
   end
 
-  def perform(message), do: apply(notifier(), :notify, [message])
+  def perform(pending_change) do
+    apply(notifier(), :notify, [pending_change])
+  end
 
   defp notifier, do: Application.get_env(:companies, :notifier)
 end

@@ -36,7 +36,7 @@ defmodule Companies.MixProject do
   defp deps do
     [
       {:appsignal, "~> 1.0"},
-      {:bamboo, "~>1.2.0"},
+      {:bamboo, github: "thoughtbot/bamboo"},
       {:ecto_sql, "~> 3.0"},
       {:gettext, "~> 0.11"},
       {:httpoison, "~> 1.5"},

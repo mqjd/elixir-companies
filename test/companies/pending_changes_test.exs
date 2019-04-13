@@ -1,5 +1,6 @@
 defmodule Companies.PendingChangesTest do
   use Companies.DataCase
+  use Bamboo.Test
 
   import Companies.Factory
   import ExUnit.CaptureLog
@@ -25,6 +26,7 @@ defmodule Companies.PendingChangesTest do
       %{total_entries: post_count} = Companies.all()
 
       assert pre_count < post_count
+      assert_email_delivered_with(subject: "Your changes have been approved")
     end
 
     test "approves a pending update change" do
@@ -33,6 +35,7 @@ defmodule Companies.PendingChangesTest do
 
       assert {:ok, %{approved: true}} = PendingChanges.approve(id, true)
       assert %{entries: [%{name: "updated"}], total_entries: 1} = Companies.all()
+      assert_email_delivered_with(subject: "Your changes have been approved")
     end
 
     test "approves a pending delete change" do
@@ -41,6 +44,7 @@ defmodule Companies.PendingChangesTest do
 
       assert {:ok, %{approved: true}} = PendingChanges.approve(id, true)
       assert %{total_entries: 0} = Companies.all()
+      assert_email_delivered_with(subject: "Your changes have been approved")
     end
 
     test "rejects a pending change" do
@@ -51,6 +55,7 @@ defmodule Companies.PendingChangesTest do
       assert Enum.empty?(PendingChanges.all())
 
       assert %{total_entries: ^pre_count} = Companies.all()
+      assert_email_delivered_with(subject: "Your changes need to be revisited")
     end
 
     test "returns an error for missing changes" do

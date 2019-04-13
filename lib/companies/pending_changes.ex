@@ -125,15 +125,14 @@ defmodule Companies.PendingChanges do
   @spec notification(term(), term()) :: {:ok, map()} | map()
   defp notification(result, user \\ nil)
 
-  defp notification({:ok, pending_change}, user) do
-    users_pending_change =
-      if is_nil(user) do
-        Repo.preload(pending_change, [:user])
-      else
-        Map.put(pending_change, :user, user)
-      end
+  defp notification({:ok, pending_change}, nil) do
+    %{user: user} = preloaded_change = Repo.preload(pending_change, [:user])
+    notification({:ok, preloaded_change}, user)
+  end
 
-    users_pending_change
+  defp notification({:ok, pending_change}, user) do
+    pending_change
+    |> Map.put(:user, user)
     |> Notify.perform()
 
     {:ok, pending_change}
