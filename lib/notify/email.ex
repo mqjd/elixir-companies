@@ -32,17 +32,18 @@ defmodule Notify.Email do
     |> with_template(template_id)
   end
 
-  @spec change_update_email(map()) :: Bamboo.Email.t()
-  defp change_update_email(%{changes: changes, resource: resource, user: %{email: email, nickname: nickname}}) do
+  defp change_update_email(%{changes: changes, note: note, resource: resource, user: user}) do
+    %{email: email, nickname: nickname} = user
+
     new_email()
     |> to(email)
     |> from("noreply@elixir-companies.com")
     |> add_dynamic_field("nickname", nickname)
+    |> add_dynamic_field("note", note)
     |> add_dynamic_field("resource", resource)
     |> add_dynamic_field("resource_name", resource_name(changes))
   end
 
-  @spec resource_name(map()) :: String.t()
   defp resource_name(%{"name" => name}), do: name
   defp resource_name(%{"title" => title}), do: title
 end

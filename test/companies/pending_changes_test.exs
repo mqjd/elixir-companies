@@ -7,6 +7,8 @@ defmodule Companies.PendingChangesTest do
 
   alias Companies.{Companies, PendingChanges}
 
+  @note "A example approval note"
+
   describe "all/0" do
     test "retrieve all pending changes" do
       insert(:pending_change)
@@ -20,7 +22,7 @@ defmodule Companies.PendingChangesTest do
       %{total_entries: pre_count} = Companies.all()
 
       %{id: id} = insert(:pending_change)
-      assert {:ok, %{approved: true}} = PendingChanges.approve(id, true)
+      assert {:ok, %{approved: true}} = PendingChanges.approve(id, @note, true)
       assert Enum.empty?(PendingChanges.all())
 
       %{total_entries: post_count} = Companies.all()
@@ -33,7 +35,7 @@ defmodule Companies.PendingChangesTest do
       %{id: company_id} = insert(:company)
       %{id: id} = insert(:pending_change, %{action: "update", changes: %{id: company_id, name: "updated"}})
 
-      assert {:ok, %{approved: true}} = PendingChanges.approve(id, true)
+      assert {:ok, %{approved: true}} = PendingChanges.approve(id, @note, true)
       assert %{entries: [%{name: "updated"}], total_entries: 1} = Companies.all()
       assert_email_delivered_with(subject: "Your changes have been approved")
     end
@@ -42,7 +44,7 @@ defmodule Companies.PendingChangesTest do
       %{id: company_id} = insert(:company)
       %{id: id} = insert(:pending_change, %{action: "delete", changes: %{id: company_id, name: "elixir-companies"}})
 
-      assert {:ok, %{approved: true}} = PendingChanges.approve(id, true)
+      assert {:ok, %{approved: true}} = PendingChanges.approve(id, @note, true)
       assert %{total_entries: 0} = Companies.all()
       assert_email_delivered_with(subject: "Your changes have been approved")
     end
@@ -51,7 +53,7 @@ defmodule Companies.PendingChangesTest do
       %{total_entries: pre_count} = Companies.all()
 
       %{id: id} = insert(:pending_change)
-      assert {:ok, %{approved: false}} = PendingChanges.approve(id, false)
+      assert {:ok, %{approved: false}} = PendingChanges.approve(id, @note, false)
       assert Enum.empty?(PendingChanges.all())
 
       assert %{total_entries: ^pre_count} = Companies.all()
@@ -59,7 +61,7 @@ defmodule Companies.PendingChangesTest do
     end
 
     test "returns an error for missing changes" do
-      assert {:error, "change not found"} = PendingChanges.approve(-1, true)
+      assert {:error, "change not found"} = PendingChanges.approve(-1, @note, true)
     end
   end
 
@@ -74,8 +76,7 @@ defmodule Companies.PendingChangesTest do
 
       output =
         capture_log(fn ->
-          assert {:ok, %{action: "delete", resource: "company"}} =
-                   PendingChanges.create(company, :delete, user, "out of business")
+          assert {:ok, %{action: "delete", resource: "company"}} = PendingChanges.create(company, :delete, user)
         end)
 
       assert output =~ "NOTIFICATION"
