@@ -68,8 +68,8 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Configure your database
 config :companies, Companies.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "companies_dev",
+  username: "mm",
+  password: "123456",
+  database: "mm",
   hostname: "localhost",
   pool_size: 10

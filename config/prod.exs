@@ -11,10 +11,10 @@ use Mix.Config
 # before starting your production server.
 config :companies, CompaniesWeb.Endpoint,
   http: [:inet6, port: System.get_env("PORT") || 4000],
-  url: [scheme: "https", host: "elixir-companies.com"],
   cache_static_manifest: "priv/static/cache_manifest.json",
   secret_key_base: System.get_env("SECRET_KEY_BASE")
-
+	url: [scheme: "https", host: "elixir-companies", port: 443],
+	force_ssl: [rewrite_on: [:x_forwarded_proto]],
 config :companies, :notifier, Notify.Slack
 
 # Do not print debug messages in production
